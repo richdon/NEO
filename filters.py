@@ -144,10 +144,10 @@ def create_filters(date=None, start_date=None, end_date=None,
     if date:
        filters.append(DateFilter(operator.eq, date))
     
-    if distance_min:
+    if distance_min :
         filters.append(DistanceFilter(operator.ge, distance_min))
         
-    if distance_max:
+    if distance_max :
         filters.append(DistanceFilter(operator.le, distance_max))
         
     if velocity_min:
@@ -156,13 +156,13 @@ def create_filters(date=None, start_date=None, end_date=None,
     if velocity_max:
         filters.append(VelocityFilter(operator.le, velocity_max))
 
-    if diameter_min:
+    if diameter_min :
         filters.append(DiameterFilter(operator.ge, diameter_min))     
 
-    if diameter_max:
+    if diameter_max :
         filters.append(DiameterFilter(operator.le, diameter_max))
     
-    if start_date:
+    if start_date :
         filters.append(DateFilter(operator.ge, start_date))
     
     if end_date:
@@ -184,4 +184,9 @@ def limit(iterator, n=None):
     :yield: The first (at most) `n` values from the iterator.
     """
     # TODO: Produce at most `n` values from the given iterator.
-    return iterator
+    import itertools
+    
+    if n == 0:
+        n = None
+        
+    return itertools.islice(iterator, n)
