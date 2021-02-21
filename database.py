@@ -44,26 +44,34 @@ class NEODatabase:
         :param neos: A collection of `NearEarthObject`s.
         :param approaches: A collection of `CloseApproach`es.
         """
+    
         self._neos = neos
         self._approaches = approaches
 
         # TODO: What additional auxiliary data structures will be useful?
         
+        # Empty dictionaries to store objects referenced by 1) designation, 2) by name
         self.neo_des_dict = {}
         self.neo_name_dict = {}
         
+        
+        # Loop the conatainer of neos and assign each to dictionary
         for neo in self._neos:
             self.neo_des_dict[neo.designation] = neo
+            
+            # if the neo has a name 
             if neo.name:
                 self.neo_name_dict[neo.name.lower()] = neo
             
                 
         # TODO: Link together the NEOs and their close approaches.
-        for approach in self._approaches:
-            if approach._designation in self.neo_des_dict:
-                neo.approaches.append(approach)
-                self.neo_des_dict[approach] = neo.approaches
-                approach.neo = self.neo_des_dict[neo.designation]
+        for approach in self._approaches:  
+            for neo in self._neos:
+                if neo.designation == approach._designation:
+                    neo.approaches.append(approach)
+                    approach.neo = neo
+                
+                
                 
       
     def get_neo_by_designation(self, designation):
