@@ -1,9 +1,9 @@
- # -*- coding: utf-8 -*-
 """
-Created on Fri Feb 12 00:47:29 2021
+Created on Fri Feb 12 00:47:29 2021.
 
 @author: richa
 """
+import operator
 """Provide filters for querying close approaches and limit the generated results.
 
 The `create_filters` function produces a collection of objects that is used by
@@ -22,7 +22,6 @@ iterator.
 
 You'll edit this file in Tasks 3a and 3c.
 """
-import operator
 
 
 class UnsupportedCriterionError(NotImplementedError):
@@ -44,6 +43,7 @@ class AttributeFilter:
     Concrete subclasses can override the `get` classmethod to provide custom
     behavior to fetch a desired attribute from the given `CloseApproach`.
     """
+
     def __init__(self, op, value):
         """Construct a new `AttributeFilter` from an binary predicate and a reference value.
 
@@ -71,38 +71,58 @@ class AttributeFilter:
 
         :param approach: A `CloseApproach` on which to evaluate this filter.
         :return: The value of an attribute of interest, comparable to `self.value` via `self.op`.
-        """                                                                               
+        """
 
     def __repr__(self):
+        """Print the status of the object."""
         return f"{self.__class__.__name__}(op=operator.{self.op.__name__}, value={self.value})"
 
-    
+
 class DateFilter(AttributeFilter):
-     @classmethod
-     def get(cls, approach):
-         return approach.time.date()
+    """Child of attribute filter."""
+
+    @classmethod
+    def get(cls, approach):
+        """Return the object's time member variable in datetime format."""
+        return approach.time.date()
+
 
 class DistanceFilter(AttributeFilter):
+    """Child of attribute filter."""
+
     @classmethod
     def get(cls, approach):
+        """Return object's distance member variable."""
         return approach.distance
 
+
 class VelocityFilter(AttributeFilter):
+    """Child of attribute filter."""
+
     @classmethod
     def get(cls, approach):
+        """Return object's velocity member variable."""
         return approach.velocity
 
+
 class DiameterFilter(AttributeFilter):
+    """Child of attribute filter."""
+
     @classmethod
     def get(cls, approach):
+        """Return object's neo.diameter member variable."""
         return approach.neo.diameter
-    
+
+
 class HazardousFilter(AttributeFilter):
+    """Child of attribute filter."""
+
     @classmethod
     def get(cls, approach):
+        """Return object's neo.hazardous member variable."""
         return approach.neo.hazardous
-    
-    
+
+
 def create_filters(date=None, start_date=None, end_date=None,
                    distance_min=None, distance_max=None,
                    velocity_min=None, velocity_max=None,
@@ -137,40 +157,38 @@ def create_filters(date=None, start_date=None, end_date=None,
     :param hazardous: Whether the NEO of a matching `CloseApproach` is potentially hazardous.
     :return: A collection of filters for use with `query`.
     """
-    # TODO: Decide how you will represent your filters.
-    
     filters = []
-    
+
     if date:
-       filters.append(DateFilter(operator.eq, date))
-    
-    if distance_min :
+        filters.append(DateFilter(operator.eq, date))
+
+    if distance_min:
         filters.append(DistanceFilter(operator.ge, distance_min))
-        
-    if distance_max :
+
+    if distance_max:
         filters.append(DistanceFilter(operator.le, distance_max))
-        
+
     if velocity_min:
         filters.append(VelocityFilter(operator.ge, velocity_min))
 
     if velocity_max:
         filters.append(VelocityFilter(operator.le, velocity_max))
 
-    if diameter_min :
-        filters.append(DiameterFilter(operator.ge, diameter_min))     
+    if diameter_min:
+        filters.append(DiameterFilter(operator.ge, diameter_min))
 
-    if diameter_max :
+    if diameter_max:
         filters.append(DiameterFilter(operator.le, diameter_max))
-    
-    if start_date :
+
+    if start_date:
         filters.append(DateFilter(operator.ge, start_date))
-    
+
     if end_date:
         filters.append(DateFilter(operator.le, end_date))
-    
-    if hazardous:
+
+    if hazardous is not None:
         filters.append(HazardousFilter(operator.eq, hazardous))
-    
+
     return filters
 
 
@@ -178,15 +196,13 @@ def limit(iterator, n=None):
     """Produce a limited stream of values from an iterator.
 
     If `n` is 0 or None, don't limit the iterator at all.
-
     :param iterator: An iterator of values.
     :param n: The maximum number of values to produce.
     :yield: The first (at most) `n` values from the iterator.
     """
-    # TODO: Produce at most `n` values from the given iterator.
     import itertools
-    
+
     if n == 0:
         n = None
-        
+
     return itertools.islice(iterator, n)

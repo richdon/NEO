@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Feb 10 19:20:39 2021
+Created on Wed Feb 10 19:20:39 2021.
 
 @author: richa
 """
@@ -18,6 +18,7 @@ data on NEOs and close approaches extracted by `extract.load_neos` and
 You'll edit this file in Tasks 2 and 3.
 """
 
+
 class NEODatabase:
     """A database of near-Earth objects and their close approaches.
 
@@ -26,6 +27,7 @@ class NEODatabase:
     help fetch NEOs by primary designation or by name and to help speed up
     querying for close approaches that match criteria.
     """
+
     def __init__(self, neos, approaches):
         """Create a new `NEODatabase`.
 
@@ -44,36 +46,22 @@ class NEODatabase:
         :param neos: A collection of `NearEarthObject`s.
         :param approaches: A collection of `CloseApproach`es.
         """
-    
         self._neos = neos
         self._approaches = approaches
 
-        # TODO: What additional auxiliary data structures will be useful?
-        
-        # Empty dictionaries to store objects referenced by 1) designation, 2) by name
         self.neo_des_dict = {}
         self.neo_name_dict = {}
-        
-        
-        # Loop the conatainer of neos and assign each to dictionary
+
         for neo in self._neos:
             self.neo_des_dict[neo.designation] = neo
-            
-            # if the neo has a name 
             if neo.name:
                 self.neo_name_dict[neo.name.lower()] = neo
-            
-                
-        # TODO: Link together the NEOs and their close approaches.
-        for approach in self._approaches:  
-            for neo in self._neos:
-                if neo.designation == approach._designation:
-                    neo.approaches.append(approach)
-                    approach.neo = neo
-                
-                
-                
-      
+
+        for approach in self._approaches:
+            approach.neo = self.neo_des_dict.get(approach._designation)
+            if approach.neo:
+                self.neo_des_dict[approach._designation].approaches.append(approach)
+
     def get_neo_by_designation(self, designation):
         """Find and return an NEO by its primary designation.
 
@@ -87,15 +75,7 @@ class NEODatabase:
         :param designation: The primary designation of the NEO to search for.
         :return: The `NearEarthObject` with the desired primary designation, or `None`.
         """
-        # TODO: Fetch an NEO by its primary designation.
-        
-    
-        if designation in str(self.neo_des_dict.keys()):
-            return self.neo_des_dict[designation]
-        else:
-            return None
-        
-        
+        return self.neo_des_dict.get(designation)
 
     def get_neo_by_name(self, name):
         """Find and return an NEO by its name.
@@ -104,19 +84,13 @@ class NEODatabase:
 
         Not every NEO in the data set has a name. No NEOs are associated with
         the empty string nor with the `None` singleton.
-
         The matching is exact - check for spelling and capitalization if no
         match is found.
 
         :param name: The name, as a string, of the NEO to search for.
         :return: The `NearEarthObject` with the desired name, or `None`.
         """
-        # TODO: Fetch an NEO by its name.
-        
-        if name.lower() in self.neo_name_dict:  
-            return self.neo_name_dict[name.lower()]
-        else:
-            return None
+        return self.neo_name_dict.get(name.lower())
 
     def query(self, filters=()):
         """Query close approaches to generate those that match a collection of filters.
@@ -132,8 +106,7 @@ class NEODatabase:
         :param filters: A collection of filters capturing user-specified criteria.
         :return: A stream of matching `CloseApproach` objects.
         """
-        # TODO: Generate `CloseApproach` objects that match all of the filters.
         for approach in self._approaches:
-            flags = list(map((lambda x : x(approach)), filters))
-            if all(flags): 
+            flags = list(map((lambda x: x(approach)), filters))
+            if all(flags):
                 yield approach
